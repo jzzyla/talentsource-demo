@@ -1,4 +1,5 @@
 import {predict} from './inference.js';
+import {measurementInfo} from './measurement-info.js';
 const $ = id => document.getElementById(id);
 const labels={baseline:'Mean baseline',ridge:'Ridge regression',forest:'Random forest'};
 const notes={baseline:'The same training-set average for every profile. A reference to beat, not a chemistry-aware model.',ridge:'A standardized linear model. Easy to inspect; cannot capture complex interactions.',forest:'An ensemble of 60 trees capturing nonlinear relationships. Its output is not a confidence score.'};
@@ -39,7 +40,7 @@ function renderComparison(){
  summary.schema.forEach((f,i)=>{
   const a=savedWines.a.values[i],b=savedWines.b.values[i],difference=b-a;
   const row=document.createElement('tr');if(a!==b)row.className='measurement-changed';
-  const label=document.createElement('th');label.scope='row';label.textContent=f.name;row.append(label);
+  const label=document.createElement('th');label.scope='row';label.textContent=`${f.name} (${measurementInfo[f.name].unit})`;row.append(label);
   for(const value of [a,b,difference===0?'—':`${difference>0?'+':''}${Number(difference.toPrecision(8))}`]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}
   $('compare-measurements').append(row);
  });
@@ -48,6 +49,12 @@ function saveWine(slot){
  if(!$('wine-form').reportValidity())return;
  const values=summary.schema.map((f,i)=>Number($(`input-${i}`).value));
  if(values.some(v=>!Number.isFinite(v)))return;
+ try { for(const model of Object.values(models))predict(model,values); }
+ catch(error){
+  if(!(error instanceof RangeError))throw error;
+  $('save-status').textContent='Profile not saved. Measurements are too large to compare safely. Check the values and units.';
+  return;
+ }
  savedWines[slot]={name:$('wine-name').value.trim()||`Wine ${slot.toUpperCase()}`,values};
  $('save-status').textContent=`${savedWines[slot].name} saved as Wine ${slot.toUpperCase()}. ${savedWines.a&&savedWines.b?'Both wines are ready to compare.':'Save another profile to complete your comparison.'}`;
  renderComparison();
@@ -66,7 +73,16 @@ function estimate(){
  }
  const values=summary.schema.map((f,i)=>Number($(`input-${i}`).value));
  const outside=summary.schema.filter((f,i)=>values[i]<f.min || values[i]>f.max);
- const result=predict(models[name],values);
+ let result;
+ try { result=predict(models[name],values); }
+ catch(error){
+  if(!(error instanceof RangeError))throw error;
+  $('score').textContent='—';
+  $('interpretation').textContent=error.message;
+  $('marker').hidden=true;
+  $('range-warning').hidden=true;
+  return;
+ }
  $('score').textContent=result.toFixed(2);
  $('marker').hidden=false;
  $('interpretation').textContent='Estimated sensory quality · continuous prediction';
@@ -79,10 +95,13 @@ try {
  models=Object.fromEntries(models.map(m=>[m.name,m]));
  for(const [i,f] of summary.schema.entries()){
   const div=document.createElement('div');div.className='field';
-  const label=document.createElement('label');label.htmlFor=`input-${i}`;label.textContent=f.name.replace(/\b\w/g,c=>c.toUpperCase());
-  const input=document.createElement('input');input.id=`input-${i}`;input.name=f.name;input.type='number';input.step='any';input.required=true;input.value=f.default;input.setAttribute('aria-describedby',`range-${i}`);
+  const info=measurementInfo[f.name];
+  const label=document.createElement('label');label.htmlFor=`input-${i}`;label.textContent=(f.name==='pH'?'pH':f.name.replace(/\b\w/g,c=>c.toUpperCase()))+' ';
+  const unit=document.createElement('span');unit.className='field-unit';unit.textContent=info.unit;label.append(unit);
+  const input=document.createElement('input');input.id=`input-${i}`;input.name=f.name;input.type='number';input.step='any';input.required=true;input.value=f.default;input.setAttribute('aria-describedby',`help-${i} range-${i}`);
   const hint=document.createElement('small');hint.id=`range-${i}`;hint.textContent=`Observed: ${f.min} – ${f.max}`;
-  div.append(label,input,hint);$('inputs').append(div);
+  const help=document.createElement('small');help.id=`help-${i}`;help.textContent=info.description;
+  div.append(label,input,help,hint);$('inputs').append(div);
  }
  const max=Math.max(...Object.values(summary.distribution));
  for(const [score,count] of Object.entries(summary.distribution)){

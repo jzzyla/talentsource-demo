@@ -16,3 +16,10 @@ test('target is excluded and artifacts have matching feature order',()=>{
   assert.ok(!models.forest.features.includes('quality'));
   for(const model of Object.values(models)) assert.deepEqual(model.features,models.forest.features);
 });
+
+test('overflowing calculations and float32 inputs are rejected',()=>{
+  const extreme=Array(11).fill(Number.MAX_VALUE);
+  assert.throws(()=>predict(models.ridge,extreme),RangeError);
+  assert.throws(()=>predict(models.forest,extreme),RangeError);
+  assert.throws(()=>predict({...models.baseline,value:Infinity},Array(11).fill(0)),RangeError);
+});
