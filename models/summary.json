@@ -1,0 +1,150 @@
+{
+  "samples": 1599,
+  "features": 11,
+  "train": 1270,
+  "test": 329,
+  "uniqueGroups": 1359,
+  "split": "GroupShuffleSplit, 20% of unique feature groups, seed 42",
+  "seed": 42,
+  "sklearn": "1.8.0",
+  "sha256": "4a402cf041b025d4566d954c3b9ba8635a3a8a01e039005d97d6a710278cf05e",
+  "metrics": {
+    "baseline": {
+      "mae": 0.6698968480003831,
+      "rmse": 0.7860563395588304,
+      "r2": -0.010309127600037327
+    },
+    "ridge": {
+      "mae": 0.5051164251669013,
+      "rmse": 0.6297808993852841,
+      "r2": 0.351476232629768
+    },
+    "forest": {
+      "mae": 0.4991474145372636,
+      "rmse": 0.6386353243127103,
+      "r2": 0.3331121568725952
+    }
+  },
+  "distribution": {
+    "3": 10,
+    "4": 53,
+    "5": 681,
+    "6": 638,
+    "7": 199,
+    "8": 18
+  },
+  "correlations": [
+    {
+      "name": "alcohol",
+      "correlation": 0.4761663240011355
+    },
+    {
+      "name": "volatile acidity",
+      "correlation": -0.390557780264007
+    },
+    {
+      "name": "sulphates",
+      "correlation": 0.25139707906926123
+    },
+    {
+      "name": "citric acid",
+      "correlation": 0.22637251431804117
+    },
+    {
+      "name": "total sulfur dioxide",
+      "correlation": -0.18510028892653765
+    },
+    {
+      "name": "density",
+      "correlation": -0.17491922778334867
+    },
+    {
+      "name": "chlorides",
+      "correlation": -0.12890655993005262
+    },
+    {
+      "name": "fixed acidity",
+      "correlation": 0.12405164911322425
+    },
+    {
+      "name": "pH",
+      "correlation": -0.05773139120538214
+    },
+    {
+      "name": "free sulfur dioxide",
+      "correlation": -0.05065605724427624
+    },
+    {
+      "name": "residual sugar",
+      "correlation": 0.013731637340066292
+    }
+  ],
+  "schema": [
+    {
+      "name": "fixed acidity",
+      "min": 4.6,
+      "max": 15.9,
+      "default": 7.9
+    },
+    {
+      "name": "volatile acidity",
+      "min": 0.12,
+      "max": 1.58,
+      "default": 0.52
+    },
+    {
+      "name": "citric acid",
+      "min": 0.0,
+      "max": 1.0,
+      "default": 0.26
+    },
+    {
+      "name": "residual sugar",
+      "min": 0.9,
+      "max": 15.5,
+      "default": 2.2
+    },
+    {
+      "name": "chlorides",
+      "min": 0.012,
+      "max": 0.611,
+      "default": 0.08
+    },
+    {
+      "name": "free sulfur dioxide",
+      "min": 1.0,
+      "max": 72.0,
+      "default": 14.0
+    },
+    {
+      "name": "total sulfur dioxide",
+      "min": 6.0,
+      "max": 289.0,
+      "default": 38.5
+    },
+    {
+      "name": "density",
+      "min": 0.99007,
+      "max": 1.00369,
+      "default": 0.9968
+    },
+    {
+      "name": "pH",
+      "min": 2.74,
+      "max": 4.01,
+      "default": 3.31
+    },
+    {
+      "name": "sulphates",
+      "min": 0.33,
+      "max": 2.0,
+      "default": 0.62
+    },
+    {
+      "name": "alcohol",
+      "min": 8.4,
+      "max": 14.9,
+      "default": 10.1
+    }
+  ]
+}
